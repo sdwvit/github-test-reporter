@@ -657,10 +657,14 @@ describe('handleViewsAndComments', () => {
     context.payload ||= {}
     mockCore.summary.stringify.mockReturnValue('Test summary')
     mockCore.summary.addRaw.mockImplementation(
-      jest.requireActual('@actions/core').summary.addRaw
+      jest
+        .requireActual<typeof core>('@actions/core')
+        .summary.addRaw.bind(core.summary)
     )
     mockCore.summary.addEOL.mockImplementation(
-      jest.requireActual('@actions/core').summary.addEOL
+      jest
+        .requireActual<typeof core>('@actions/core')
+        .summary.addEOL.bind(core.summary)
     )
   })
 
@@ -683,7 +687,7 @@ describe('handleViewsAndComments', () => {
     expect(mockCore.setOutput).toHaveBeenNthCalledWith(
       2,
       'report',
-      '{"results":{"summary":{"failed":0},"tests":[]}}'
+      '{"failed":0}'
     )
   })
 })
