@@ -1,9 +1,11 @@
 import * as core from '@actions/core'
+import { context } from '@actions/github'
 import { createCheckRun } from '../../src/client/github/checks'
 import {
   createStatusCheck,
   findExistingMarkedComment,
-  handleComment
+  handleComment,
+  handleViewsAndComments
 } from '../../src/github/handler'
 import { CtrfReport, Inputs } from '../../src/types'
 import * as githubClient from '../../src/client/github'
@@ -645,5 +647,43 @@ describe('handleComment', () => {
       )
       expect(mockUpdateComment).not.toHaveBeenCalled()
     })
+  })
+})
+
+describe('handleViewsAndComments', () => {
+  const mockCore = jest.mocked(core)
+  beforeEach(() => {
+    jest.clearAllMocks()
+    context.payload ||= {}
+    mockCore.summary.stringify.mockReturnValue('Test summary')
+    mockCore.summary.addRaw.mockImplementation(
+      jest.requireActual('@actions/core').summary.addRaw
+    )
+    mockCore.summary.addEOL.mockImplementation(
+      jest.requireActual('@actions/core').summary.addEOL
+    )
+  })
+
+  it('should create a check run with views and comments', async () => {
+    const inputs: Inputs = {
+      statusCheckName: 'Test Status',
+      statusCheck: true
+    } as Inputs
+
+    const report = {
+      results: {
+        summary: {
+          failed: 0
+        },
+        tests: []
+      }
+    } as unknown as CtrfReport
+    await handleViewsAndComments(inputs, report)
+
+    expect(mockCore.setOutput).toHaveBeenNthCalledWith(
+      2,
+      'report',
+      '{"results":{"summary":{"failed":0},"tests":[]}}'
+    )
   })
 })

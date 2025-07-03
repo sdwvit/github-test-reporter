@@ -20,7 +20,7 @@ export async function runAction(): Promise<void> {
     if (inputs.exitOnFail) {
       exitActionOnFail(report)
     }
-    core.startGroup(`🏁 Report completed`)
+    core.startGroup(`🏁 Report completed successfully`)
     core.endGroup()
     core.startGroup(
       `⭐ CTRF is open source and free to use, you can show your support by starring the repo at https://github.com/ctrf-io/github-test-reporter`
